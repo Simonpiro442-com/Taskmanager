@@ -7,21 +7,31 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Checking out Task Manager source code'
                 checkout scm
             }
         }
+
         stage('Verify Environment') {
             steps {
-                echo "Checking Java and Gradle version"
+                echo 'Checking Java and Gradle versions'
 
                 sh 'java -version'
 
                 sh 'chmod +x gradlew'
 
                 sh './gradlew --version'
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                echo 'Building and testing Spring Boot application'
+
+                sh './gradlew clean build'
             }
         }
 
