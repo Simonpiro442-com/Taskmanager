@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -9,15 +10,15 @@ pipeline {
 
     parameters {
         choice(
-            name: 'DEPLOY_ENV', 
-            choices: ['development', 'staging', 'production'], 
+            name: 'DEPLOY_ENV',
+            choices: ['development', 'staging', 'production'],
             description: 'Select the target environment'
         )
 
         booleanParam(
             name: 'RUN_TESTS',
-            defaultValue: 'true',
-            description: 'Should automated test runs?'
+            defaultValue: true,
+            description: 'Should automated tests run?'
         )
 
         string(
@@ -28,26 +29,25 @@ pipeline {
     }
 
     environment {
-        APP_NAME: 'taskmanager'
-        DOCKER_IMAGE: 'taskmanager'
+        APP_NAME = 'taskmanager'
+        DOCKER_IMAGE = 'taskmanager'
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Checking our Task Manager source code'
+                echo 'Checking out Task Manager source code'
                 checkout scm
 
-                echo "Build_Number: ${env.BUILD_NUMBER}"
+                echo "Build Number: ${env.BUILD_NUMBER}"
                 echo "Job Name: ${env.JOB_NAME}"
                 echo "Workspace: ${env.WORKSPACE}"
                 echo "Git Commit: ${env.GIT_COMMIT}"
-
             }
         }
 
-        stage('Display Configuration') (
+        stage('Display Configuration') {
             steps {
                 echo "Application: ${env.APP_NAME}"
                 echo "Docker Image: ${env.DOCKER_IMAGE}"
@@ -56,7 +56,7 @@ pipeline {
                 echo "Release Version: ${params.RELEASE_VERSION}"
                 echo "Run Tests: ${params.RUN_TESTS}"
             }
-        )
+        }
 
         stage('Verify Environment') {
             steps {
@@ -82,6 +82,7 @@ pipeline {
 
             steps {
                 echo 'Running automated tests'
+
                 sh './gradlew test'
             }
         }
@@ -97,7 +98,7 @@ pipeline {
         }
     }
 
-    post (
+    post {
         always {
             junit(
                 testResults: 'build/test-results/test/*.xml',
@@ -108,11 +109,11 @@ pipeline {
         }
 
         success {
-            echo "Task Manager CI pipeline completed successfully"
+            echo 'Task Manager CI pipeline completed successfully!'
         }
 
         failure {
-            echo "Task manager CI pipeline failed"
+            echo 'Task Manager CI pipeline failed!'
         }
-    )
+    }
 }
