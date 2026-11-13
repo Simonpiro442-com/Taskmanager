@@ -1,12 +1,52 @@
 services:
+
   jenkins:
     image: jenkins/jenkins:lts-jdk21
     container_name: jenkins-lab
+
     ports:
       - "8080:8080"
+
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskmanager_db
+      SPRING_DATASOURCE_USERNAME: taskmanager_user
+
     volumes:
       - jenkins_home:/var/jenkins_home
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: taskmanager-postgres
+
+    environment:
+      POSTGRES_DB: taskmanager_db
+      POSTGRES_USER: taskmanager_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "127.0.0.1:5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskmanager_user -d taskmanager_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
     restart: unless-stopped
 
 volumes:
   jenkins_home:
+  postgres_data:
