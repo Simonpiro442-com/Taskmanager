@@ -146,6 +146,20 @@ pipeline {
             }
         }
 
+        
+        stage('Publish Test Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'build/reports/tests/test',
+                    reportFiles: 'index.html',
+                    reportName: 'Task Manager Test Report'
+                ])
+            }
+        }
+
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts(
@@ -154,6 +168,7 @@ pipeline {
                 )
             }
         }
+
     }
 
     
