@@ -156,6 +156,7 @@ pipeline {
         }
     }
 
+    
     post {
         always {
             echo 'Pipeline execution has finished'
@@ -163,6 +164,27 @@ pipeline {
             junit(
                 testResults: 'build/test-results/test/*.xml',
                 allowEmptyResults: true
+            )
+
+            mail(
+                to: 'simonpi442@gmail.com',
+                subject: "${currentBuild.currentResult}: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                body: """
+    Hello,
+
+    Your Jenkins pipeline has completed.
+
+    Application: Task Manager
+    Job: ${env.JOB_NAME}
+    Build Number: ${env.BUILD_NUMBER}
+    Build Status: ${currentBuild.currentResult}
+
+    Build Details:
+    ${env.BUILD_URL}
+
+    Regards,
+    Jenkins
+    """
             )
         }
 
@@ -182,4 +204,5 @@ pipeline {
             sh 'rm -f .retry-demo-counter'
         }
     }
+
 }
