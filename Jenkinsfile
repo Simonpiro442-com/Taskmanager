@@ -1,3 +1,4 @@
+@Library('taskmanager-library') _
 
 pipeline {
     agent any
@@ -52,7 +53,7 @@ pipeline {
 
             steps {
                 echo 'Building application'
-                sh './gradlew clean assemble'
+                buildApplication()
             }
         }
 
